@@ -15,6 +15,7 @@ export const GetConfig = async (
     console.log('from cache res =>', ConfigFromCache);
 
     if (ConfigFromCache) {
+      Cache.ttl(PROXYID)
       return ConfigFromCache;
     } else {
       const ConfigFromDB = await ConfigDB.findOne({
