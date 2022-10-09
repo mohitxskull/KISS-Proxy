@@ -1,8 +1,6 @@
-import NodeCache from 'node-cache';
-import { ConfigDB } from './mongodb.js';
-import { ConfigTypes } from './types.js';
-
-const Cache = new NodeCache({ stdTTL: 60, checkperiod: 70 });
+import { Cache } from './lib/Cache.js';
+import { ConfigDB } from './lib/Client/MongoDB.js';
+import { ConfigTypes } from './lib/Types.js';
 
 export const CheckProxyId = (PROXYID: string): boolean => {
   return /^[a-zA-Z0-9]*$/.test(PROXYID);

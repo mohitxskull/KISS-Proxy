@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
-import { ConfigTypes } from './types.js';
+import { ConfigTypes } from '../Types.js';
 
 dotenv.config();
 

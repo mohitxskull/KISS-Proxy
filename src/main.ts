@@ -2,9 +2,13 @@ import httpProxy from 'http-proxy';
 import cookieParser from 'cookie-parser';
 import LZString from 'lz-string';
 import express, { Request, Response } from 'express';
-import dotenv from 'dotenv';
 import { CheckProxyId, GetConfig } from './GetConfig.js';
-import { KissCookieTypes } from './types.js';
+import { KissCookieTypes, ConfigTypes } from './lib/Types.js';
+import dotenv from 'dotenv';
+import { ProtectedRoute } from './lib/Middleware.js';
+import { ConfigSchema, ProxyIDSchema } from './lib/Schema.js';
+import { Cache } from './lib/Cache.js';
+import bodyParser from 'body-parser';
 
 dotenv.config();
 
@@ -13,6 +17,53 @@ const proxy = httpProxy.createProxyServer({});
 const port = process.env.PORT || 9879;
 
 app.use(cookieParser());
+
+const jsonParser = bodyParser.json();
+
+app.post(
+  '/cache/update/config/update/:APIPASS/',
+  ProtectedRoute,
+  jsonParser,
+  async (req: Request, res: Response) => {
+    const Config: ConfigTypes = req.body;
+
+    try {
+      await ConfigSchema.validateAsync(Config);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(401);
+      return;
+    }
+
+    const SetConfigInCache = Cache.set(Config._id, Config);
+
+    console.log(SetConfigInCache);
+
+    res.sendStatus(200);
+  },
+);
+
+app.get(
+  '/cache/update/config/delete/:APIPASS/:PROXYID',
+  ProtectedRoute,
+  async (req: Request, res: Response) => {
+    const ProxyID: string = req.params.PROXYID;
+
+    try {
+      await ProxyIDSchema.validateAsync(ProxyID);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(401);
+      return;
+    }
+
+    const DeleteConfigFromCache = Cache.del(ProxyID);
+
+    console.log(DeleteConfigFromCache);
+
+    res.sendStatus(200);
+  },
+);
 
 app.all('/k/:ProxyId', async (req: Request, res: Response) => {
   const PROXYID = req.params.ProxyId || null;

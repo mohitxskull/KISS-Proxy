@@ -6,6 +6,7 @@ export interface KissCookieTypes {
 export interface ConfigTypes {
   _id: string;
   name: string;
+  userid: string;
   proxy: boolean;
   active: boolean;
   createdAt: number;
